@@ -2,7 +2,6 @@ const express = require("express");
 const cors = require("cors");
 const mongoose = require("mongoose");
 const shortid = require("shortid");
-const isURL = require("is-valid-http-url");
 const bodyParser = require("body-parser");
 require("dotenv").config();
 
@@ -12,6 +11,9 @@ const app = express();
 app.use(bodyParser.urlencoded({ extended: false }));
 
 const DB = process.env['DB']
+
+var expression = /(https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s]{2,}|www\.[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s]{2,}|https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9]+\.[^\s]{2,}|www\.[a-zA-Z0-9]+\.[^\s]{2,})/gi;
+var regex = new RegExp(expression);
 
 // Basic Configuration
 const port = process.env.PORT || 3000;
@@ -40,7 +42,7 @@ app.post("/api/shorturl", async function (req, res) {
     // console.log(req);
     const url = req.body.url;
 
-    if (!isUrl(url)) {
+    if (!url.match(regex)) {
         res.status(401).json({
             error: "invalid url",
         });
