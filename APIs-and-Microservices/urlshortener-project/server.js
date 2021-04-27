@@ -2,7 +2,7 @@ const express = require("express");
 const cors = require("cors");
 const mongoose = require("mongoose");
 const shortid = require("shortid");
-const validURL = require("valid-url");
+const isURL = require("is-valid-http-url");
 const bodyParser = require("body-parser");
 require("dotenv").config();
 
@@ -40,7 +40,7 @@ app.post("/api/shorturl", async function (req, res) {
     // console.log(req);
     const url = req.body.url;
 
-    if (!validURL.isWebUri(url)) {
+    if (!isUrl(url)) {
         res.status(401).json({
             error: "invalid url",
         });
