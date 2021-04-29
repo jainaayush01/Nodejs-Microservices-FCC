@@ -46,7 +46,7 @@ app.post('/api/users', async (req, res) => {
         findUser = new User({
           username: username
         });
-        
+
         await findUser.save();
 
         res.json({
@@ -112,8 +112,8 @@ app.post('/api/users/:_id/exercises', async (req, res) => {
         }
 
         let user = await User.findOneAndUpdate({ _id: userid }, {
-          $push: {log: exercise},
-          $inc: {count: 1},
+          $push: { log: exercise },
+          $inc: { count: 1 },
         });
         res.json({
           _id: userid,
@@ -134,42 +134,62 @@ app.post('/api/users/:_id/exercises', async (req, res) => {
 
 app.get('/api/users/:_id/logs', async (req, res) => {
   try {
-
     let userid = req.params._id;
-    
-    let findUser = await User.findOne({ _id: userid }, { __v: 0});
 
+    let findUser = await User.findOne({ _id: userid }, { __v: 0 });
     if (!findUser) {
-      console.log(findUser);
       res.end('unknown _id');
     }
     else {
-      res.json(findUser);
+      const { _id, count, username, log } = findUser;
+      var templog = log.slice();
+
+      if (req.params.from && req.params.to) {
+        let from = new Date(req.params.from);
+        let to = new Date(req.params.to);
+
+        if (!(from == "Invalid Date" || to == "Invalid Date")) {
+          templog = log.filter((exercise) => {
+            var date = new Date(exercise.date);
+            return (date <= to && date >= from);
+          })
+        }
+        else {
+          res.end('invalid date parameters');
+        }
+      }
+
+      if (req.query.limit) {
+        let limit = Number(req.query.limit);
+        if (Number(limit)) {
+          if (limit < count) {
+            templog.length = limit;
+          }
+        }
+        else {
+          res.end('invalid limit');
+        }
+      }
+
+      templog = templog.map((exercise) => {
+        var newex = { description: exercise.description, duration: exercise.duration, date: exercise.date };
+        return newex;
+      })
+
+      res.json({
+        _id,
+        username,
+        count,
+        log: templog
+      });
     }
   }
-  catch(error) {
+  catch (error) {
     console.log(error);
-    res.json({error});
+    res.json({ error });
   }
 })
 
 const listener = app.listen(process.env.PORT || 3000, () => {
   console.log('Your app is listening on port ' + listener.address().port)
 })
-
-function getDate(dateString) {
-  let date
-  if (!dateString) {
-    date = new Date;
-  }
-  else {
-    let date2 = /^-?\d+$/.test(dateString);
-    if (date2) {
-      date = new Date(parseInt(dateString));
-    }
-    else {
-      date = new Date(dateString);
-    }
-  }
-  return date;
-}
