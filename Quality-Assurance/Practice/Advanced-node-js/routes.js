@@ -49,9 +49,16 @@ module.exports = (app, myDataBase) => {
   )
 
   app.get('/auth/github', passport.authenticate('github', { failureRedirect: '/' }))
+  
   app.route('/auth/github/callback').get(passport.authenticate('github', { failureRedirect: '/' }), (req, res) => {
-    res.redirect('/profile');
+    req.session.user_id = req.user.id
+    res.redirect('/chat');
   });
+
+
+  app.get('/chat', (req, res) => {
+    res.render(process.cwd() + '/views/pug/chat', { user: req.user });
+  })
 
   app.use((req, res, next) => {
     res.status(404).type('text').send('Not Found');
