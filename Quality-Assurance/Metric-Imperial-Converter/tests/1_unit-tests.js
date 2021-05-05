@@ -42,4 +42,24 @@ suite('Unit Tests', function(){
       done();
     })
   })
+
+
+  suite('convertHandler.getUnit(input)', function() {
+    test('Correct Input Unit', function(done) {
+      var correctInput = ["gal", "l", "mi", "km", "lbs", "kg", "GAL", "L", "MI", "KM", "LBS", "KG"];
+      correctInput.forEach((unit) => {
+        var input = `23${unit}`;
+        unit = unit.toLowerCase();
+        if(unit === "l") unit = "L";
+        assert.equal(convertHandler.getUnit(input), unit);
+      })
+      done();
+    })
+    
+    test('Inorrect Input Unit', function(done) {
+      var input = "23notunit";
+      assert.equal(convertHandler.getUnit(input), 'invalid unit');
+      done();
+    })
+  })
 });
