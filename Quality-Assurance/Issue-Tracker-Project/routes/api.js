@@ -89,99 +89,230 @@ module.exports = function(app) {
 
 
   app.put('/api/issues/:project', async (req, res) => {
-    console.log(req.body)
-    console.log(req.params)
-    console.log(req.query)
-
-    let _id = req.body._id;
     try {
-      if (!_id) {
+      if (!req.body._id) {
+        res.json({
+          error: 'missing _id'
+        })
+      }
+      else {
+        let _id = req.body._id;
+        if (!mongoose.isValidObjectId(_id)) {
+          res.json({
+            error: 'could not update',
+            _id: req.body._id
+          })
+        }
+        else {
+          let updateFlag = true;
+          let update = {};
+          if (req.body.hasOwnProperty("issue_title")) {
+            updateFlag = false;
+            update["issue_title"] = req.body.issue_title;
+          }
+
+          if (req.body.hasOwnProperty("issue_text")) {
+            updateFlag = false;
+            update["issue_text"] = req.body.issue_text;
+          }
+
+          if (req.body.hasOwnProperty("created_by")) {
+            updateFlag = false;
+            update["created_by"] = req.body.created_by;
+          }
+
+          if (req.body.hasOwnProperty("assigned_to")) {
+            updateFlag = false;
+            update["assigned_to"] = req.body.assigned_to;
+          }
+
+          if (req.body.hasOwnProperty("status_text")) {
+            updateFlag = false;
+            update["status_text"] = req.body.status_text;
+          }
+
+          if (req.body.hasOwnProperty("open")) {
+            updateFlag = false;
+            update["open"] = req.body.open;
+          }
+          console.log({ update });
+
+          if (updateFlag) {
+            res.json({
+              error: 'no update field(s) sent',
+              _id: req.body._id
+            })
+          }
+          else {
+            update["updated_on"] = new Date();
+            console.log({ ...update });
+            Issue.findByIdAndUpdate({ _id }, { ...update }, (err, doc) => {
+              if (err) {
+                res.json({
+                  error: 'could not update',
+                  _id: req.body._id
+                })
+              }
+              else {
+                if(doc) {
+                  console.log({ doc });
+                  res.json({
+                    result: 'updated successfully',
+                    _id: req.body._id
+                  })
+                }
+                else {
+                  res.json({
+                    error: 'could not update',
+                    _id: req.body._id
+                  })
+                }
+              }
+            });
+          }
+        }
+      }
+    }
+    catch (err) {
+      console.log(err);
+      res.json({
+        error: 'could not update',
+        _id: req.body._id
+      })
+    }
+  })
+  // app.put('/api/issues/:project', async (req, res) => {
+  //   console.log(req.body)
+  //   console.log(req.params)
+  //   console.log(req.query)
+
+  //   let _id = req.body._id;
+  //   try {
+  //     if (!_id) {
+  //       res.json({
+  //         error: "missing _id"
+  //       })
+  //     }
+  //     else {
+  //       if (mongoose.isValidObjectId(_id)) {
+  //         let update = { updated_on: new Date() }
+  //         let toUpdate = false;
+  //         let { issue_text, issue_title, status_text, assigned_to, open, created_by } = req.body;
+
+  //         if (issue_text
+  //           // && issue_text !== ""
+  //         ) {
+  //           update["issue_text"] = issue_text;
+  //           toUpdate = true;
+  //         }
+  //         if (issue_title
+  //           // && issue_title !== ""
+  //         ) {
+  //           update["issue_title"] = issue_title;
+  //           toUpdate = true;
+  //         }
+  //         if (created_by
+  //           // && created_by !== ""
+  //         ) {
+  //           update["created_by"] = created_by;
+  //           toUpdate = true;
+  //         }
+  //         if (status_text
+  //           // && status_text !== ""
+  //         ) {
+  //           update["status_text"] = status_text;
+  //           toUpdate = true;
+  //         }
+  //         if (req.body.hasOwnProperty("open")) {
+  //           update["open"] = open;
+  //           toUpdate = true;
+  //         }
+  //         if (assigned_to
+  //           // && assigned_to !== ""
+  //         ) {
+  //           update["assigned_to"] = assigned_to;
+  //           toUpdate = true;
+  //         }
+
+  //         if (!toUpdate) {
+  //           res.json({
+  //             error: 'no update field(s) sent',
+  //             _id
+  //           })
+  //         }
+  //         else {
+  //           console.log(update);
+  //           let issue = await Issue.findByIdAndUpdate(_id, update);
+  //           if (issue) {
+  //             res.json({
+  //               result: 'successfully updated',
+  //               "_id": _id
+  //             });
+  //           }
+  //           else {
+  //             res.json({
+  //               error: 'could not update',
+  //               _id
+  //             })
+  //           }
+  //         }
+  //         // }
+  //       }
+  //       else {
+  //         res.json({
+  //           error: 'could not update',
+  //           _id
+  //         })
+  //       }
+  //     }
+  //   }
+  //   catch (err) {
+  //     res.json({
+  //       error: 'could not update',
+  //       _id
+  //     })
+  //   }
+  // })
+
+
+  app.delete('/api/issues/:project', async (req, res) => {
+    console.log(req.body);
+    try {
+      if (!req.body._id) {
         res.json({
           error: "missing _id"
         })
       }
       else {
+        let _id = req.body._id;
         if (mongoose.isValidObjectId(_id)) {
-          let update = { updated_on: new Date() }
-          let toUpdate = false;
-          let { issue_text, issue_title, status_text, assigned_to, open, created_by } = req.body;
-
-          if (issue_text
-            && issue_text !== ""
-          ) {
-            update["issue_text"] = issue_text;
-            toUpdate = true;
-          }
-          if (issue_title
-            && issue_title !== ""
-          ) {
-            update["issue_title"] = issue_title;
-            toUpdate = true;
-          }
-          if (created_by
-            && created_by !== ""
-          ) {
-            update["created_by"] = created_by;
-            toUpdate = true;
-          }
-          if (status_text
-            && status_text !== ""
-          ) {
-            update["status_text"] = status_text;
-            toUpdate = true;
-          }
-          if (req.body.hasOwnProperty("open")) {
-            update["open"] = open;
-            toUpdate = true;
-          }
-          if (assigned_to
-            && assigned_to !== ""
-          ) {
-            update["assigned_to"] = assigned_to;
-            toUpdate = true;
-          }
-
-          if (!toUpdate) {
+          let issue = await Issue.findByIdAndDelete(_id);
+          if (issue) {
             res.json({
-              error: 'no update field(s) sent',
+              result: 'successfully deleted',
               _id
             })
           }
           else {
-            let issue = await Issue.findByIdAndUpdate(_id, update);
-            console.log(issue);
-            if (issue) {
-              res.json({
-                result: 'successfully updated',
-                _id
-              });
-            }
-            else {
-              res.json({
-                error: 'could not update',
-                _id
-              })
-            }
+            res.json({
+              error: 'could not delete',
+              _id: req.body._id
+            })
           }
         }
         else {
           res.json({
-            error: 'could not update',
-            _id
+            error: 'could not delete',
+            _id: req.body._id
           })
         }
       }
     }
     catch (err) {
       res.json({
-        error: 'could not update',
-        _id
+        error: 'could not delete',
+        _id: req.body._id
       })
     }
-  })
-
-
-  app.delete('/api/issues/:project', async (req, res) => {
-    res.end('ok')
   })
 };
