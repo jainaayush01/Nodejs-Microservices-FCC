@@ -11,7 +11,7 @@ module.exports = function(app) {
         project
       }
       if (req.query) {
-        let { issue_text, issue_title, status_text, assigned_to, open, created_by, updated_on, created_on } = req.query;
+        let { issue_text, issue_title, status_text, assigned_to, open, created_by, updated_on, created_on, _id } = req.query;
 
         if (issue_text) {
           query["issue_text"] = issue_text;
@@ -36,6 +36,10 @@ module.exports = function(app) {
         }
         if (assigned_to) {
           query["assigned_to"] = assigned_to;
+        }
+
+        if(_id) {
+          query["_id"] = _id;
         }
       }
 
@@ -157,7 +161,7 @@ module.exports = function(app) {
                 if(doc) {
                   console.log({ doc });
                   res.json({
-                    result: 'updated successfully',
+                    result: 'successfully updated',
                     _id: req.body._id
                   })
                 }
