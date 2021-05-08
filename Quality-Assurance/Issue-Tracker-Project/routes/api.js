@@ -81,7 +81,6 @@ module.exports = function(app) {
         });
 
         await issue.save();
-        // console.log(issue);
         res.json(issue);
       }
     }
@@ -139,7 +138,6 @@ module.exports = function(app) {
             updateFlag = false;
             update["open"] = req.body.open;
           }
-          console.log({ update });
 
           if (updateFlag) {
             res.json({
@@ -149,7 +147,6 @@ module.exports = function(app) {
           }
           else {
             update["updated_on"] = new Date();
-            console.log({ ...update });
             Issue.findByIdAndUpdate({ _id }, { ...update }, (err, doc) => {
               if (err) {
                 res.json({
@@ -159,7 +156,6 @@ module.exports = function(app) {
               }
               else {
                 if(doc) {
-                  console.log({ doc });
                   res.json({
                     result: 'successfully updated',
                     _id: req.body._id
@@ -188,7 +184,6 @@ module.exports = function(app) {
 
 
   app.delete('/api/issues/:project', async (req, res) => {
-    console.log(req.body);
     try {
       if (!req.body._id) {
         res.json({
@@ -221,6 +216,7 @@ module.exports = function(app) {
       }
     }
     catch (err) {
+      console.log(err);
       res.json({
         error: 'could not delete',
         _id: req.body._id
