@@ -7,6 +7,7 @@ chai.use(chaiHttp);
 
 suite('Functional Tests', function() {
   let _idtest;
+  let invalidId = "5871dda29faedc3491ff93bb";
   suite('Tests for POST request to /api/issues/{project}', () => {
     test('Create an issue with every field', (done) => {
       chai
@@ -259,6 +260,88 @@ suite('Functional Tests', function() {
 
           assert.property(res.body, 'error');
           assert.equal(res.body.error, 'no update field(s) sent');
+
+          done();
+        })
+    })
+
+    test('Update an issue with no fields to update', (done) => {
+      chai
+        .request(server)
+        .put('/api/issues/test')
+        .send({
+          "_id": invalidId,
+          "issue_text": "updated text"
+        })
+        .end((err, res) => {
+          assert.equal(res.status, 200);
+          assert.equal(res.type, 'application/json');
+
+          assert.property(res.body, 'error');
+          assert.property(res.body, '_id');
+
+          assert.equal(res.body.error, 'could not update');
+          assert.equal(res.body._id, invalidId);
+
+          done();
+        })
+    })
+  })
+
+  suite('Tests for DELETE request to /api/issues/{project}', () => {
+    test('Delete an issue', (done) => {
+      chai
+        .request(server)
+        .delete('/api/issues/test')
+        .send({
+          "_id": _idtest,
+          "issue_text": "updated text"
+        })
+        .end((err, res) => {
+          assert.equal(res.status, 200);
+          assert.equal(res.type, 'application/json');
+
+          assert.property(res.body, 'result');
+          assert.property(res.body, '_id');
+
+          assert.equal(res.body._id, _idtest);
+          assert.equal(res.body.result, 'successfully deleted');
+
+          done();
+        })
+    })
+
+    test('Delete an issue with an invalid _id', (done) => {
+      chai
+        .request(server)
+        .delete('/api/issues/test')
+        .send({
+          "_id": invalidId,
+        })
+        .end((err, res) => {
+          assert.equal(res.status, 200);
+          assert.equal(res.type, 'application/json');
+
+          assert.property(res.body, 'error');
+          assert.property(res.body, '_id');
+
+          assert.equal(res.body.error, 'could not delete');
+          assert.equal(res.body._id, invalidId);
+
+          done();
+        })
+    })
+
+    test('Delete an issue with missing _id', (done) => {
+      chai
+        .request(server)
+        .delete('/api/issues/test')
+        .end((err, res) => {
+          assert.equal(res.status, 200);
+          assert.equal(res.type, 'application/json');
+
+          assert.property(res.body, 'error');
+          assert.equal(res.body.error, 'missing _id');
 
           done();
         })
