@@ -89,7 +89,6 @@ class Translator {
     console.log(changes);
 
     let output = text;
-    // let splitOutput = output.split(" ");
 
     const changeKeys = Object.keys(changes);
 
@@ -100,44 +99,45 @@ class Translator {
         britTitle = britTitle.replace(britTitle[0], britTitle[0].toUpperCase());
 
         output = output.replace(amerTitle, britTitle);
-        // splitOutput[amerTitle] = britTitle;
 
         amerTitle = amerTitle.replace(amerTitle[0], amerTitle[0].toUpperCase());
         output = output.replace(amerTitle, britTitle);
-        // splitOutput[amerTitle] = britTitle;      
       }
       else {
         let outChange = changes[change];
         output = output.replace(change, changes[change]);
-        // splitOutput[change] = changes[change];
         
         change = change.replace(change[0], change[0].toUpperCase());
         changes[change] = outChange.replace(outChange[0], outChange[0].toUpperCase());
 
         output = output.replace(change, changes[change]);
-        // splitOutput[change] = changes[change];
       }
     })
-    
+
     let splitOutput = output.split(" ");    
     let splitText = text.split(" ");
 
-    splitOutput.forEach((outWord, outIdx) => {
-      let match = splitText.find((inWord, inIdx) => inWord.toLowerCase() === outWord && inIdx >= outIdx);
+    // splitOutput.forEach((outWord, outIdx) => {
+    //   let match = splitText.find((inWord, inIdx) => inWord.toLowerCase() === outWord && inIdx >= outIdx);
 
-      if(match) {
-        if(match[0].toUpperCase === match[0]) {
-          outWord = outWord.replace(outWord[0], outWord[0].toUpperCase());
-        }
-        splitOutput[outIdx] = outWord;
-      }
-    })
+    //   if(match) {
+    //     if(match[0].toUpperCase === match[0]) {
+    //       outWord = outWord.replace(outWord[0], outWord[0].toUpperCase());
+    //     }
+    //     splitOutput[outIdx] = outWord;
+    //   }
+    // })
 
     console.log({splitOutput});
     output = splitOutput.join(" ");
-
     console.log({output});
+
     splitOutput.forEach((outWord, outIdx) => {
+      const match = outWord.match(/\d{1,2}:\d{2}/);
+      if(match) {
+        outWord = match.join("").split(":").join(".");
+        splitOutput[outIdx] = outWord;
+      }
       if(!splitText.includes(outWord)) {
         outWord = `<span class="highlight">${outWord}</span>`;
         splitOutput[outIdx] = outWord;
@@ -160,41 +160,6 @@ class Translator {
       return this.britishToAmerican(text);
     }
   }
-
-  // translate(text, locale) {
-  //   let translation = "";
-  //   // let lines = text.split('\n');
-  //   // for (let i = 0; i < lines.length; ++i, translation += "\n") {
-  //   // let words = lines[i].split(' ');
-  //   let words = text.split(' ');
-  //   for (let j = 0; j < words.length; ++j, translation += " ") {
-  //     let word = words[j];
-  //     if (locale === 'american-to-british') {
-  //       if (americanToBritishTitles.hasOwnProperty(word)) {
-  //         translation += '<span class="highlight">' + americanToBritishTitles[word] + '</span>';
-  //       }
-  //       else if (americanToBritishSpelling.hasOwnProperty(word)) {
-  //         translation += '<span class="highlight">' + americanToBritishSpelling[word] + '</span>';
-  //       }
-  //       else if (americanOnly.hasOwnProperty(word)) {
-  //         translation += '<span class="highlight">' + americanOnly[word] + '</span>';
-  //       }
-  //       else if (word.match(':')) {
-  //         let time = word.split(':');
-  //         translation += '<span class="highlight">' + time[0] + '.' + time[1] + '</span>';
-  //       }
-  //       else {
-  //         translation += word;
-  //       }
-  //     }
-  //     else {
-  //       translation += word;
-  //     }
-  //     if (words.length === j - 1) break;
-  //   }
-  //   // }
-  //   return translation;
-  // }
 }
 
 module.exports = Translator;
