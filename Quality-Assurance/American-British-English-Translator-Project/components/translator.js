@@ -28,6 +28,8 @@ const britTitleKeys = Object.keys(britishToAmericanTitles);
 const britKeys = Object.keys(britishOnly);
 const britEqKeys = Object.keys(britishEquivalents);
 
+const britishTime = new RegExp(/\d{1,2}\.\d{2}/);
+const americanTime = new RegExp(/\d{1,2}:\d{2}/);
 
 class Translator {
   americanToBritish(text) {
@@ -57,7 +59,6 @@ class Translator {
       if (i < n - 1) {
         let word = `${words[i]} ${words[i + 1]}`;
         let word2 = `${splitText[i]} ${splitText[i + 1]}`;
-
 
         if (word.match(/\.$/)) {
           word = word.replace(".", "");
@@ -104,15 +105,12 @@ class Translator {
         output = output.replace(change, changes[change]);
     })
 
-    // let splitText = text.split(" ");
     let splitOutput = output.split(" ");    
-
-    // output = splitOutput.join(" ");
 
     splitOutput.forEach((outWord, outIdx) => {
       const match = outWord.match(/\d{1,2}:\d{2}/);
       if(match) {
-        outWord = match.join("").split(":").join(".");
+        outWord = outWord.replace(":", ".");
         splitOutput[outIdx] = outWord;
       }
       if(!splitText.includes(outWord)) {
@@ -140,12 +138,13 @@ class Translator {
 
         if (word.match(/\.$/)) {
           word = word.replace(".", "");
+          word2 = word2.replace(".", "");
         }
 
-        if (amerKeys.includes(word)) {
+        if (britKeys.includes(word)) {
           changes[word2] = britishOnly[word];
         }
-        else if (amerEqKeys.includes(word)) {
+        else if (britEqKeys.includes(word)) {
           changes[word2] = britishEquivalents[word];
         }
       }
@@ -156,12 +155,13 @@ class Translator {
 
         if (word.match(/\.$/)) {
           word = word.replace(".", "");
+          word2 = word2.replace(".", "");
         }
 
-        if (amerKeys.includes(word)) {
+        if (britKeys.includes(word)) {
           changes[word2] = britishOnly[word];
         }
-        else if (amerEqKeys.includes(word)) {
+        else if (britEqKeys.includes(word)) {
           changes[word2] = britishEquivalents[word];
         }
       }
@@ -171,6 +171,7 @@ class Translator {
 
       if (i === n - 1 && word.match(/\.$/)) {
         word = word.replace(".", "");
+        word2 = word2.replace(".", "");
       }
 
       if (britKeys.includes(word)) {
@@ -198,14 +199,11 @@ class Translator {
     })
 
     let splitOutput = output.split(" ");    
-    // let splitText = text.split(" ");
-
-    // output = splitOutput.join(" ");
 
     splitOutput.forEach((outWord, outIdx) => {
       const match = outWord.match(/\d{1,2}\.\d{2}/);
       if(match) {
-        outWord = match.join("").split(".").join(":");
+        outWord = outWord.replace(".", ":");
         splitOutput[outIdx] = outWord;
       }
       if(!splitText.includes(outWord)) {
