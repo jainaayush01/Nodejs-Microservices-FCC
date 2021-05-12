@@ -32,94 +32,82 @@ const britEqKeys = Object.keys(britishEquivalents);
 class Translator {
   americanToBritish(text) {
     const changes = {};
-    const input = text.toLowerCase();
-    const words = input.split(" ");
+    const words = text.toLowerCase().split(" ");
+    const splitText = text.split(" ");
     const n = words.length;
 
     for (let i = 0; i < n; ++i) {
       if (i < n - 2) {
         let word = `${words[i]} ${words[i + 1]} ${words[i + 2]}`;
+        let word2 = `${splitText[i]} ${splitText[i + 1]} ${splitText[i + 2]}`;
 
         if (word.match(/\.$/)) {
           word = word.replace(".", "");
+          word2 = word2.replace(".", "");
         }
 
         if (amerKeys.includes(word)) {
-          changes[word] = americanOnly[word];
+          changes[word2] = americanOnly[word];
         }
         else if (amerEqKeys.includes(word)) {
-          changes[word] = americanEquivalents[word];
+          changes[word2] = americanEquivalents[word];
         }
       }
 
       if (i < n - 1) {
         let word = `${words[i]} ${words[i + 1]}`;
+        let word2 = `${splitText[i]} ${splitText[i + 1]}`;
+
 
         if (word.match(/\.$/)) {
           word = word.replace(".", "");
+          word2 = word2.replace(".", "");
         }
 
         if (amerKeys.includes(word)) {
-          changes[word] = americanOnly[word];
+          changes[word2] = americanOnly[word];
         }
         else if (amerEqKeys.includes(word)) {
-          changes[word] = americanEquivalents[word];
+          changes[word2] = americanEquivalents[word];
         }
       }
 
       let word = words[i];
+      let word2 = splitText[i];
 
       if (i === n - 1 && word.match(/\.$/)) {
         word = word.replace(".", "");
+        word2 = word2.replace(".", "");
       }
 
       if (amerKeys.includes(word)) {
-        changes[word] = americanOnly[word];
+        changes[word2] = americanOnly[word];
       }
       else if (amerEqKeys.includes(word)) {
-        changes[word] = americanEquivalents[word];
+        changes[word2] = americanEquivalents[word];
       }
       else if (amerSpellKeys.includes(word)) {
-        changes[word] = americanToBritishSpelling[word];
+        changes[word2] = americanToBritishSpelling[word];
       }
       else if (amerTitleKeys.includes(word)) {
-        changes[word] = americanToBritishTitles[word];
+        let title = americanToBritishTitles[word];
+        title = title.replace(title[0], title[0].toUpperCase());
+        changes[word2] = title;
       }
     }
-    console.log(changes);
 
     let output = text;
 
     const changeKeys = Object.keys(changes);
 
     changeKeys.forEach(change => {
-      if (amerTitleKeys.includes(change)) {
-        let amerTitle = change;
-        let britTitle = americanToBritishTitles[amerTitle];
-        britTitle = britTitle.replace(britTitle[0], britTitle[0].toUpperCase());
-
-        output = output.replace(amerTitle, britTitle);
-
-        amerTitle = amerTitle.replace(amerTitle[0], amerTitle[0].toUpperCase());
-        output = output.replace(amerTitle, britTitle);
-      }
-      else {
-        let outChange = changes[change];
         output = output.replace(change, changes[change]);
-        
-        change = change.replace(change[0], change[0].toUpperCase());
-        changes[change] = outChange.replace(outChange[0], outChange[0].toUpperCase());
-
-        output = output.replace(change, changes[change]);
-      }
     })
 
+    // let splitText = text.split(" ");
     let splitOutput = output.split(" ");    
-    let splitText = text.split(" ");
 
-    console.log({splitOutput});
-    output = splitOutput.join(" ");
-    console.log({output});
+    // output = splitOutput.join(" ");
 
     splitOutput.forEach((outWord, outIdx) => {
       const match = outWord.match(/\d{1,2}:\d{2}/);
@@ -137,96 +125,82 @@ class Translator {
     return output;
   }
 
+
+
   britishToAmerican(text) {
     const changes = {};
-    const input = text.toLowerCase();
-    const words = input.split(" ");
+    const words = text.toLowerCase().split(" ");
+    const splitText = text.split(" ");
     const n = words.length;
 
     for (let i = 0; i < n; ++i) {
       if (i < n - 2) {
         let word = `${words[i]} ${words[i + 1]} ${words[i + 2]}`;
+        let word2 = `${splitText[i]} ${splitText[i + 1]} ${splitText[i + 2]}`;
 
         if (word.match(/\.$/)) {
           word = word.replace(".", "");
         }
 
         if (amerKeys.includes(word)) {
-          changes[word] = britishOnly[word];
+          changes[word2] = britishOnly[word];
         }
         else if (amerEqKeys.includes(word)) {
-          changes[word] = britishEquivalents[word];
+          changes[word2] = britishEquivalents[word];
         }
       }
 
       if (i < n - 1) {
         let word = `${words[i]} ${words[i + 1]}`;
+        let word2 = `${splitText[i]} ${splitText[i + 1]}`;
 
         if (word.match(/\.$/)) {
           word = word.replace(".", "");
         }
 
         if (amerKeys.includes(word)) {
-          changes[word] = britishOnly[word];
+          changes[word2] = britishOnly[word];
         }
         else if (amerEqKeys.includes(word)) {
-          changes[word] = britishEquivalents[word];
+          changes[word2] = britishEquivalents[word];
         }
       }
 
       let word = words[i];
+      let word2 = splitText[i];
 
       if (i === n - 1 && word.match(/\.$/)) {
         word = word.replace(".", "");
       }
 
       if (britKeys.includes(word)) {
-        changes[word] = britishOnly[word];
+        changes[word2] = britishOnly[word];
       }
       else if (britEqKeys.includes(word)) {
-        changes[word] = britishEquivalents[word];
+        changes[word2] = britishEquivalents[word];
       }
       else if (britSpellKeys.includes(word)) {
-        changes[word] = britishToAmericanSpelling[word];
+        changes[word2] = britishToAmericanSpelling[word];
       }
       else if (britTitleKeys.includes(word)) {
-        changes[word] = britishToAmericanTitles[word];
+        let title = britishToAmericanTitles[word];
+        title = title.replace(title[0], title[0].toUpperCase());
+        changes[word2] = title;
       }
     }
-    console.log(changes);
 
     let output = text;
 
     const changeKeys = Object.keys(changes);
 
     changeKeys.forEach(change => {
-      if (britTitleKeys.includes(change)) {
-        let britTitle = change;
-        let amerTitle = americanToBritishTitles[britTitle];
-        amerTitle = amerTitle.replace(amerTitle[0], amerTitle[0].toUpperCase());
-
-        output = output.replace(britTitle, amerTitle);
-
-        britTitle = britTitle.replace(britTitle[0], britTitle[0].toUpperCase());
-        output = output.replace(britTitle, britTitle);
-      }
-      else {
-        let outChange = changes[change];
-        output = output.replace(change, changes[change]);
-        
-        change = change.replace(change[0], change[0].toUpperCase());
-        changes[change] = outChange.replace(outChange[0], outChange[0].toUpperCase());
-
-        output = output.replace(change, changes[change]);
-      }
+      output = output.replace(change, changes[change]);
     })
 
     let splitOutput = output.split(" ");    
-    let splitText = text.split(" ");
+    // let splitText = text.split(" ");
 
-    console.log({splitOutput});
-    output = splitOutput.join(" ");
-    console.log({output});
+    // output = splitOutput.join(" ");
 
     splitOutput.forEach((outWord, outIdx) => {
       const match = outWord.match(/\d{1,2}\.\d{2}/);
